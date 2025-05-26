@@ -7,8 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # github.repository liefert z.B. "D4rkiiee/autocon3-ws-a3", wir wandeln es unten in lower-case um
-  IMAGE_REPO: ${{ github.repository }}
+  IMAGE_REPO: ${{ github.repository }}  # z.B. "D4rkiiee/autocon3-ws-a3"
   IMAGE_TAG: v1
 
 jobs:
@@ -28,14 +27,19 @@ jobs:
 
       - name: Prepare lowercase image name
         run: |
+          # Repository-Name in Kleinbuchstaben transformieren
           IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_REPO }}" | tr '[:upper:]' '[:lower:]')
+          # Kompletten Image-Name mit Tag in die Umgebungsvariablen schreiben
           echo "IMAGE_NAME_LOWER=${IMAGE_NAME_LOWER}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
 
       - name: Docker Build
         working-directory: lab2/kafka-alarm-sim
-        run: docker build \
-          -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }} \
-          -f Dockerfile.kafka-alert-exporter .
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }} \
+            -f Dockerfile.kafka-alert-exporter \
+            .
 
       - name: Docker Push
-        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}
